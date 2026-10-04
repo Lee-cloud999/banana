@@ -1,8 +1,9 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><title>바나나 키우기</title><meta name="description" content="바나나를 먹이고 놀아주며 키우는 귀여운 육성 게임"><meta name="theme-color" content="#ffd84a"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="바나나 키우기"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><style id="polish">
-#stage #bubble{top:22px;left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:78%;font-size:12px;padding:4px 10px;line-height:1.3;border-radius:14px}
+#stage #bubble{top:33px;left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:78%;font-size:12px;padding:4px 10px;line-height:1.3;border-radius:14px}
 #stage .roomb{top:auto;bottom:8px;left:auto;right:8px;padding:3px 7px;font-size:10.5px;gap:3px}
 #stage .roomb .bi{width:14px;height:14px}
 body.editing .roomb{display:none}
+#stage.hashat #bubble{top:22px}
 .tabs .tab{min-width:0;padding:8px 0;font-size:11.5px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden}
 .tabs .tab .bi{width:14px;height:14px}
 .fmseeds{gap:4px}.fmseed{font-size:10px;letter-spacing:-.4px;white-space:nowrap;min-width:0;padding:6px 0}
@@ -2291,6 +2292,8 @@ function showNotice(tries){
 
 /* ==== /WALK-CHESS-JS ==== */
 
+/* 모자를 쓰면 말풍선을 조금 더 위로 */
+(function(){ const _r = render; render = function(){ const r = _r.apply(this, arguments); try{ $('stage').classList.toggle('hashat', !!(S.worn && S.worn.hat)); }catch(e){} return r; }; })();
 /* ===== 시작 ===== */
 let isNew; try{ isNew = !localStorage.getItem(KEY); }catch(e){ isNew = true; }
 load();
