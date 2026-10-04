@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "바나나 키우기",
+  "short_name": "바나나",
+  "description": "바나나를 먹이고 놀아주며 키우는 귀여운 육성 게임",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff7d6",
+  "theme_color": "#ffd84a",
+  "categories": ["games", "kids"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
