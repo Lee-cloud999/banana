@@ -2,7 +2,7 @@
 #stage #bubble{top:33px;left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:78%;font-size:12px;padding:4px 10px;line-height:1.3;border-radius:14px}
 #stage .roomb{top:auto;bottom:8px;left:auto;right:8px;padding:3px 7px;font-size:10.5px;gap:3px}
 #stage .roomb .bi{width:14px;height:14px}
-body.editing .roomb{display:none}
+body.editing .roomb{display:none}body:has(#walk:not([hidden])) .roomb{display:none}
 #stage.hashat #bubble{top:22px}
 .tabs .tab{min-width:0;padding:8px 0;font-size:11.5px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden}
 .tabs .tab .bi{width:14px;height:14px}
@@ -987,8 +987,8 @@ function pickFind(){                       // 길에서 요리 재료를 랜덤�
 }
 
 /* ---- 점프 게임: 화면을 톡 눌러 점프! 장애물은 피하고 코인은 모아요 ---- */
-const WG = {BASE:24, HALF:26, BODY:70, JUMP_MS:800, PEAK:105, LEAD:2400};
-const WG_OBS = [{id:'obs_rock',w:34,h:26},{id:'obs_stump',w:32,h:32},{id:'obs_bush',w:40,h:30}];
+const WG = {BASE:24, HALF:26, BODY:70, JUMP_MS:850, PEAK:120, LEAD:2400};
+const WG_OBS = [{id:'obs_rock',w:54,h:42},{id:'obs_stump',w:52,h:52},{id:'obs_bush',w:64,h:48}];
 let wgOn = false, wgPaused = false, wgEnts = [], wgJump = -1, wgRaf = 0, wgLast = 0, wgT = 0, wgNext = 0, wgInv = 0, wgHits = 0;
 function wgY(){ if(wgJump < 0) return 0; const s = (wgNow()-wgJump)/WG.JUMP_MS; return s >= 1 ? 0 : 4*WG.PEAK*s*(1-s); }
 function wgNow(){ return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now(); }
@@ -1012,7 +1012,7 @@ function wgSpawn(){
   if(r < .30){ wgAdd('obs', ob.id, ob.w, ob.h, 0, x0); }
   else if(r < .62){                                                   // 장애물 위로 코인 아치
     wgAdd('obs', ob.id, ob.w, ob.h, 0, x0);
-    [[-44,72],[0,100],[44,72]].forEach(([dx,hg])=> wgAdd('coin','coin',26,26,hg, x0 + ob.w/2 - 13 + dx));
+    [[-44,85],[0,115],[44,85]].forEach(([dx,hg])=> wgAdd('coin','coin',26,26,hg, x0 + ob.w/2 - 13 + dx));
   }
   else if(r < .80){ for(let i=0;i<3;i++) wgAdd('coin','coin',26,26,6, x0 + i*38); }          // 땅 코인 줄
   else if(r < .90){ for(let i=0;i<3;i++) wgAdd('coin','coin',26,26,100, x0 + i*38); }        // 공중 코인 줄
@@ -1062,7 +1062,7 @@ function wgFrame(ts){
     en.el.style.transform = `translateX(${en.x}px)`;
     const mid = en.x + en.w/2, dx = Math.abs(mid - cx);
     if(en.kind === 'obs'){
-      if(dx < WG.HALF + en.w/2 - 8 && y < en.h - 6) wgHit(en);
+      if(dx < WG.HALF + en.w/2 - 18 && y < en.h - 6) wgHit(en);
     } else if(dx < 36 && en.hgt + 6 >= y - 8 && en.hgt <= y + WG.BODY){ wgGet(en); }
     if(en.x < -80){ en.done = true; en.el.remove(); }
   }
