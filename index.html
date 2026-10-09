@@ -1655,14 +1655,75 @@ function snapNow(face){
 function unreadCount(){ return phState().msgs.filter(m=>!m.read).length; }
 function updPhoneDot(){ const b = $('phbtn'); if(b) b.classList.toggle('dot', unreadCount() > 0); }
 
-const PH_MAIL = [
-  ['안녕! 나는 코순이야. 오늘도 같이 놀자!', 'coin', 15],
-  ['바나나야, 오늘 날씨 좋아! 산책 가자~', 'coin', 20],
-  ['맛있는 거 먹었어? 나는 땅콩 먹었어!', 'coin', 12],
-  ['보고 싶어서 문자 보냈어. 힘내!', 'coin', 25],
-  ['사진 많이 찍어서 앨범에 모아 봐!', 'coin', 18],
-  ['요리하는 거 재밌더라. 같이 해 보자!', 'coin', 22]
-];
+const PH_MAIL = {
+  hungry:[
+    '{me}야, 배고프지 않아? 맛있는 거 먹어!',
+    '배에서 꼬르륵 소리 나는 거 아니야? 얼른 먹어!',
+    '밥 먹을 시간이야! 사과나 주먹밥 어때?',
+    '나는 땅콩 먹었는데, {me}는 뭐 먹었어? 꼭 챙겨 먹어!',
+    '배고프면 기운이 없어져. 맛있는 거 먹고 힘내자!'
+  ],
+  sad:[
+    '기분이 안 좋아 보여. 같이 놀면 괜찮아질 거야!',
+    '무슨 일 있어? 놀아 주기를 눌러 봐, 기분이 좋아질 거야!',
+    '힘들 땐 산책이 최고야. 같이 걸어 보자!',
+    '내가 옆에 있을게. 힘내, {me}야!',
+    '울적할 땐 사진을 찍어 봐. 웃음이 날지도 몰라!'
+  ],
+  tired:[
+    '많이 피곤해 보여. 오늘은 일찍 푹 자자!',
+    '졸리면 재우기를 눌러 줘. 푹 자야 힘이 나!',
+    '{me}야, 피곤하면 쉬어도 돼. 잘 자고 와!'
+  ],
+  morning:[
+    '{me}야, 좋은 아침! 오늘도 같이 놀자!',
+    '일어났어? 나는 아침부터 땅콩 먹었어!',
+    '아침 햇살이 따뜻해. 산책 가기 딱 좋은 날이야!',
+    '오늘은 어떤 하루가 될까? 기대돼!',
+    '{me}야, 아침 먹었어? 든든하게 먹어야 해!'
+  ],
+  noon:[
+    '점심 시간이야! 뭐 먹을까 고민이야~',
+    '오후엔 사진 찍으러 나가 볼래?',
+    '졸리지 않아? 나는 낮잠 자고 싶어!',
+    '요리하는 거 재밌더라. 같이 해 보자!',
+    '{me}야, 놀러 와! 보고 싶어!'
+  ],
+  evening:[
+    '오늘 하루 어땠어? 나는 정말 재밌었어!',
+    '저녁 노을이 너무 예뻐. 같이 보고 싶다!',
+    '오늘도 수고했어. 푹 쉬어!',
+    '{me}야, 이제 슬슬 잘 시간이야. 잘 자!',
+    '별이 반짝반짝해! 좋은 꿈 꿔~'
+  ],
+  young:[
+    '{me}야, 쑥쑥 커라! 응원하고 있어!',
+    '아직 작아도 괜찮아. 천천히 크면 돼!'
+  ],
+  grown:[
+    '{me}가 정말 많이 컸다! 대단해!',
+    '이제 완전 멋진 바나나가 됐네!'
+  ],
+  any:[
+    '안녕! 나는 코순이야. 오늘도 같이 놀자!',
+    '맛있는 거 먹었어? 나는 땅콩 먹었어!',
+    '보고 싶어서 문자 보냈어. 힘내!',
+    '사진 많이 찍어서 앨범에 모아 봐!',
+    '농장에서 뭐 키우고 있어? 궁금해!',
+    '꾸미기 해 봤어? {me}한테는 리본이 잘 어울릴 것 같아!',
+    '두더지 잡기 해 봤어? 나는 아직 한 번도 못 이겼어...',
+    '틱택토 하자! 이번엔 내가 이길 거야!',
+    '{me}는 내 제일 친한 친구야!',
+    '오늘 {me} 생각나서 웃음이 났어. 히히',
+    '코인 모았어? 모은 걸로 맛있는 거 사 먹자!',
+    '도감에 있는 친구들도 {me} 보고 싶대!',
+    '나 새로운 노래 배웠어! 다음에 들려줄게~',
+    '비 오는 날엔 방에서 같이 놀면 좋겠다!',
+    '{me}야, 오늘도 웃는 하루 보내!',
+    '산책하다가 예쁜 꽃을 봤어. 같이 가자!',
+    '가끔은 천천히 쉬어 가도 괜찮아!'
+  ]
+};
 const PH_BANANA_MAIL = [
   '안녕! 나는 도감에서 지내는 {n}야. {me}(이)가 잘 지내는지 궁금해서 문자 보냈어!',
   '{me}야, 나 {n}야! 도감에서 항상 응원하고 있어. 힘내!',
@@ -1682,16 +1743,25 @@ function phSchedule(){
   }
   return p.sched;
 }
+function koText(t){
+  const me = S.name || '바나나', hr = new Date(t).getHours(), P = PH_MAIL;
+  const fill = x=>x.replace(/\{me\}/g, me);
+  let pool = [];
+  if(S.hunger < 30) pool = pool.concat(P.hungry, P.hungry);               // 상태가 안 좋으면 그 이야기를 자주
+  else if(S.mood < 30) pool = pool.concat(P.sad, P.sad);
+  else if(S.energy < 30) pool = pool.concat(P.tired, P.tired);
+  pool = pool.concat(hr < 11 ? P.morning : hr < 17 ? P.noon : P.evening);
+  pool = pool.concat((S.level||1) < 6 ? P.young : (S.level||1) >= 10 ? P.grown : [], P.any);
+  const recent = phState().msgs.filter(m=>m.from === '코순이').slice(0, 8).map(m=>m.text);
+  const fresh = pool.map(fill).filter(x=>!recent.includes(x));
+  return pickOf(fresh.length ? fresh : pool.map(fill));
+}
 function makeMsg(t){
   const cands = (S.hall||[]).filter(r=>!r.parked && (r.level||0) >= MAX_LEVEL);
   const k = Math.floor(Math.random()*(cands.length+1));   // 0 = 코순이, 그 외 = 도감 만렙 바나나
   const gift = 10 + Math.floor(Math.random()*16);
   if(k === 0){
-    let m;
-    if(S.hunger < 30) m = '바나나야, 배고프지 않아? 맛있는 거 먹어!';
-    else if(S.mood < 30) m = '기분이 안 좋아 보여. 같이 놀면 괜찮아질 거야!';
-    else m = pickOf(PH_MAIL)[0];
-    return {id:t+Math.random(), from:'코순이', text:m, gift, got:false, read:false, t};
+    return {id:t+Math.random(), from:'코순이', text:koText(t), gift, got:false, read:false, t};
   }
   const r = cands[k-1];
   return {id:t+Math.random(), from:r.name, av:'b', text:pickOf(PH_BANANA_MAIL).replace(/\{n\}/g, r.name).replace(/\{me\}/g, S.name), gift, got:false, read:false, t};
