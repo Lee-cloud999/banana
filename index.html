@@ -615,7 +615,8 @@ function tick(sec, offline){
   }else{
     S.hunger = clamp(S.hunger - sec*0.05,  floor);
     S.mood   = clamp(S.mood   - sec*0.03,  floor);
-    S.energy = clamp(S.energy - sec*0.02,  floor);
+    // 에너지는 천천히 줄어요 (켜 둘 때 0.007/초, 자리를 비웠을 땐 0.003/초). 비운 동안엔 30 밑으로 내려가지 않아요
+    S.energy = clamp(S.energy - sec*(offline ? 0.003 : 0.007), offline ? Math.min(S.energy, 30) : 0);
   }
 }
 
