@@ -2478,7 +2478,7 @@ const MQ_POOL = [
   {id:'walk', t:'산책 다녀오기', n:1, c:15}, {id:'game', t:'미니게임 1판 하기', n:1, c:15}, {id:'cook', t:'요리 만들기', n:1, c:15},
   {id:'photo', t:'사진 찍기', n:1, c:10}, {id:'farm', t:'농장에서 수확하기', n:2, c:15}
 ];
-const MQ_BONUS = 30, ATT_REWARD = [20,20,30,30,40,40,100];
+const MQ_BONUS = 30, ATT_REWARD = [10,10,15,15,20,20,50];
 function mqPick(d){
   let h = 0; for(const ch of d) h = (h*31 + ch.charCodeAt(0)) >>> 0;
   const pool = MQ_POOL.slice(), out = [];
