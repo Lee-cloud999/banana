@@ -84,7 +84,7 @@ body.editing .roomb{display:none}body:has(#walk:not([hidden])) .roomb{display:no
   .mbox input{font:inherit;font-size:16px;padding:10px 12px;border:2px solid #c9a94a;border-radius:12px;background:#fff;color:#5a3a12;text-align:center}
   .mbtns{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:10px}
   .food{position:absolute;left:0;top:0;width:44px;height:44px;pointer-events:none;z-index:4;will-change:transform}
-  .food svg,.conf svg{width:100%;height:100%;display:block}
+  .food svg,.conf svg,.food img,.conf img{width:100%;height:100%;display:block;object-fit:contain}
   #foods{position:fixed;inset:0;background:rgba(90,58,18,.4);display:flex;align-items:flex-end;justify-content:center;z-index:9}
   #foods[hidden]{display:none}
   .fbox{background:#fffdf2;border:3px solid #8a4b12;border-bottom:0;border-radius:22px 22px 0 0;width:100%;max-width:440px;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;color:#5a3a12}
