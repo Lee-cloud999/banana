@@ -507,6 +507,11 @@ html,body{overscroll-behavior-y:contain}
 .fprice{display:flex;align-items:center;gap:3px;justify-content:center;font-weight:800;color:#8a4b12}
 .fprice .ci{width:13px;height:13px}
 #foods .fbox{max-height:60vh;overflow-y:auto}
+.ftabs{display:flex;gap:6px;margin:0 0 8px}
+.ftabs button{flex:1;padding:7px 4px;font-size:13.5px;background:#fff3d6;box-shadow:none}
+.ftabs button.on{background:#ffd23f}
+#dgrid[hidden]{display:none}
+.dempty{grid-column:1/-1;text-align:center;font-size:13px;font-weight:700;opacity:.7;padding:18px 6px;line-height:1.5}
 .hpw{position:relative;width:54px;height:54px;flex:none}
 .hpw .pw{position:absolute;left:0;bottom:0;width:100%}
 .hpw .pw img:not(.dc){width:100%;height:100%}
@@ -595,7 +600,7 @@ html,body{overscroll-behavior-y:contain}
 <div id="phone" hidden><div class="phdev"><div class="phbar"><button id="phback" hidden>‹ 뒤로</button><span id="phtime">12:00</span><button id="phclose" aria-label="닫기">닫기</button></div><div id="phscreen"></div><div class="toast" id="phtoast"></div></div></div>
 <div id="farm" hidden><div class="fxfull" id="fmfx"></div><div class="chwrap"><div class="chhead"><div class="t" style="flex:1;font-size:19px">농장</div><div class="chs" id="fmt"></div></div><div id="fmbody"></div><div class="chbtns" style="grid-template-columns:1fr"><button id="fmexit">나가기</button></div></div></div>
 <div id="cook" hidden><div class="fxfull" id="ckfx"></div><div class="chwrap"><div class="chhead"><div class="t" style="flex:1;font-size:19px">요리하기</div><div class="chs" id="ckt"></div></div><div class="cktabs" id="cktabs"><button data-t="cook" class="on">요리하기</button><button data-t="dish">내 요리</button><button data-t="book">레시피 도감</button></div><div id="ckbody"></div><div class="chbtns" style="grid-template-columns:1fr"><button id="ckexit">나가기</button></div></div></div>
-<div id="foods" hidden><div class="fbox"><p>무엇을 먹일까요?</p><div class="fgrid" id="fgrid"></div><button id="fclose" class="fclose">닫기</button></div></div>
+<div id="foods" hidden><div class="fbox"><p>무엇을 먹일까요?</p><div class="ftabs" id="ftabs"><button data-ft="basic" class="on">기본 먹이</button><button data-ft="dish">내 요리</button></div><div class="fgrid" id="fgrid"></div><div class="fgrid" id="dgrid" hidden></div><button id="fclose" class="fclose">닫기</button></div></div>
 
 <div id="hall" hidden><div class="fbox"><p>바나나 도감</p><div id="halllist"></div><button id="hallnew" class="hn" hidden>새 바나나 키우기</button><button id="hallclose" class="fclose">닫기</button></div></div>
 <div id="modal" hidden><div class="mbox"><p id="mtext"></p><input id="minput" maxlength="8" autocomplete="off"><div class="mbtns"><button id="mok">확인</button><button id="mcancel">취소</button></div></div></div>
@@ -758,6 +763,20 @@ FOODS.forEach((f,i)=>{
   b.onclick=()=>{ if(f.price && pantryState()[f.id] > 0){ pantryState()[f.id]--; $('foods').hidden=true; dropFood(f); return; } if(f.price){ if((S.coins||0) < f.price){ $('foods').hidden=true; setFace('sad',1500); say('코인이 '+(f.price-(S.coins||0))+'개 모자라요'); return; } S.coins -= f.price; render(); } $('foods').hidden=true; dropFood(f); };
   grid.appendChild(b);
 });
+let fTab = 'basic';
+function dishGridUpd(){
+  const g = $('dgrid'); if(!Array.isArray(S.dishes)) S.dishes = [];
+  if(!S.dishes.length){ g.innerHTML = '<div class="dempty">아직 만든 요리가 없어요.<br>요리하기에서 재료를 섞어 보세요!</div>'; return; }
+  g.innerHTML = S.dishes.map((d,i)=>{ const f = ckInfo(d.k), q = ckEff(d);
+    return `<button class="fitem" data-dish="${i}"><span class="e">${icon(ckIcon(d.k))}</span><span>${f.name}</span><small>${STAR(d.s)}<br>배부름 +${q.h} · 기분 +${q.m}</small><small class="fprice">보유 ${d.n}</small></button>`; }).join('');
+}
+function fTabSet(t){
+  fTab = t; if(t === 'dish') dishGridUpd();
+  $('fgrid').hidden = t !== 'basic'; $('dgrid').hidden = t !== 'dish';
+  $('ftabs').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.ft === t));
+}
+$('ftabs').onclick = e=>{ const b = e.target.closest && e.target.closest('button'); if(b) fTabSet(b.dataset.ft); };
+$('dgrid').onclick = e=>{ const b = e.target.closest && e.target.closest('[data-dish]'); if(b) ckEat(+b.dataset.dish); };
 $('fclose').onclick = ()=>{ $('foods').hidden = true; };
 $('foods').onclick = e=>{ if(e.target===$('foods')) $('foods').hidden = true; };
 
@@ -789,6 +808,7 @@ $('feed').onclick = ()=>{
   if(S.sleeping) return say('쿨쿨... 자는 중이에요 💤');
   if(S.hunger >= 95){ setFace('surprised',1500); return say('배불러요! 더는 못 먹어요 😮'); }
   if(typeof foodGridUpd === 'function') foodGridUpd();
+  fTabSet(fTab === 'dish' && S.dishes && S.dishes.length ? 'dish' : 'basic');
   $('foods').hidden = false;
 };
 $('play').onclick = ()=>{
@@ -2060,7 +2080,7 @@ function ckEat(i){
   const f = ckInfo(d.k), q = ckEff(d);
   d.n--; if(d.n <= 0) S.dishes.splice(i,1);
   save();
-  $('cook').hidden = true;
+  $('cook').hidden = true; $('foods').hidden = true;
   dropFood({id:ckIcon(d.k), hunger:q.h, mood:q.m, exp:q.exp, say:`${f.name} 맛있다!`});
 }
 function ckOpen(){
