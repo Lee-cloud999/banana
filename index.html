@@ -115,7 +115,10 @@ body.editing .roomb{display:none}body:has(#walk:not([hidden])) .roomb{display:no
   .wide small{display:inline;margin-left:6px}
   #shop{position:fixed;inset:0;background:rgba(90,58,18,.15);display:flex;align-items:flex-end;justify-content:center;z-index:9}
   #shop[hidden]{display:none}
-  #shop .fbox{max-height:50vh;overflow-y:auto}
+  #shop .fbox{position:relative;max-height:50vh;overflow:hidden;grid-template-rows:auto auto auto minmax(0,1fr) auto;gap:8px;padding-top:12px}
+  #shop .fbox p{padding:0 34px}
+  #shop #shopgrid{overflow-y:auto;min-height:0;align-content:start;padding-bottom:4px}
+  #shop .fclose{position:absolute;top:8px;right:10px;width:32px;height:32px;min-height:0;padding:0;border-radius:50%;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center}
   .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
   .tab{padding:8px 2px;font-size:13px;background:#f1e6b0;box-shadow:0 3px 0 #8a4b12}
   .tab.on{background:var(--yellow)}
@@ -598,7 +601,7 @@ html,body{overscroll-behavior-y:contain}
 
 
 <div id="maxfx" hidden><div class="mxrays"></div><div class="mxcard" id="mxcard"></div></div>
-<div id="shop" hidden><div class="fbox"><p><svg class="bi" viewBox="0 0 64 40" aria-hidden="true"><g stroke="#8a4b12" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M32 20 Q4 -4 6 20 Q4 44 32 20 Z" fill="#ff7aa2"/><path d="M32 20 Q60 -4 58 20 Q60 44 32 20 Z" fill="#ff7aa2"/><circle cx="32" cy="20" r="6.5" fill="#ff5c8a"/></g></svg> 꾸미기 <span class="sc"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g stroke="#8a4b12" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="10" fill="#ffd23f" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#f0a81d" stroke-width="2"/><path d="M12 8 L12 16" stroke="#f0a81d" stroke-width="2" fill="none"/></g></svg> <b id="shopcoins">0</b></span></p><div class="wornbar" id="wornbar"></div><div class="tabs" id="shoptabs"></div><div class="fgrid" id="shopgrid"></div><div id="shopmsg" class="smsg"></div><button id="shopclose" class="fclose">닫기</button></div></div>
+<div id="shop" hidden><div class="fbox"><p><svg class="bi" viewBox="0 0 64 40" aria-hidden="true"><g stroke="#8a4b12" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M32 20 Q4 -4 6 20 Q4 44 32 20 Z" fill="#ff7aa2"/><path d="M32 20 Q60 -4 58 20 Q60 44 32 20 Z" fill="#ff7aa2"/><circle cx="32" cy="20" r="6.5" fill="#ff5c8a"/></g></svg> 꾸미기 <span class="sc"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g stroke="#8a4b12" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="10" fill="#ffd23f" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#f0a81d" stroke-width="2"/><path d="M12 8 L12 16" stroke="#f0a81d" stroke-width="2" fill="none"/></g></svg> <b id="shopcoins">0</b></span></p><div class="wornbar" id="wornbar"></div><div class="tabs" id="shoptabs"></div><div class="fgrid" id="shopgrid"></div><div id="shopmsg" class="smsg"></div><button id="shopclose" class="fclose" aria-label="닫기">✕</button></div></div>
 <div id="editbar" hidden><button id="editsmall">작게</button><button id="editbig">크게</button><button id="editrl">↺ 5°</button><button id="editrr">↻ 5°</button><button id="editreset">처음</button><button id="editapply">적용</button></div>
 <div id="games" hidden><div class="fbox"><p>바나나 두더지</p><div class="gcard"><div class="gt"><span id="gicon"></span> 난이도를 골라요</div><div class="gp">구멍에서 튀어나오는 바나나를 30초 동안 톡톡 터치해요! 목표 점수를 넘기면 코인을 많이 받고, 못 넘겨도 조금 받아요.</div><div class="fgrid" id="glevels"></div></div><button id="gclose" class="fclose">닫기</button></div></div>
 <div id="tgames" hidden><div class="fbox"><p>틱택토</p><div class="gcard"><div class="gt"><span id="ticon"></span> 난이도를 골라요</div><div class="gp">내가 동그라미, 바나나가 가위표예요. 세 개를 한 줄로 이으면 이겨요. 지거나 비겨도 조금 받아요.</div><div class="fgrid" id="tlevels"></div></div><button id="tclose" class="fclose">닫기</button></div></div>
