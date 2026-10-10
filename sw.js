@@ -1,6 +1,6 @@
 // 바나나 키우기 서비스 워커: 한 번 열면 인터넷 없이도 실행돼요.
 // 게임을 업데이트하면 아래 버전 숫자를 올려 주세요. (v1 → v2 ...)
-const VERSION = 'banana-v23';
+const VERSION = 'banana-v24';
 const FILES = ['./', './index.html', './manifest.json', './privacy.html',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png', './icons/favicon-48.png'];
