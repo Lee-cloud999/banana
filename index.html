@@ -506,7 +506,11 @@ html,body{overscroll-behavior-y:contain}
 /* v2 */
 .fprice{display:flex;align-items:center;gap:3px;justify-content:center;font-weight:800;color:#8a4b12}
 .fprice .ci{width:13px;height:13px}
-#foods .fbox{max-height:60vh;overflow-y:auto}
+#foods .fbox{position:relative;max-height:50vh;overflow:hidden;grid-template-rows:auto auto minmax(0,1fr);gap:8px;padding-top:12px}
+#foods .fbox p{padding:0 34px}
+#foods .fgrid{overflow-y:auto;min-height:0;align-content:start;padding-bottom:4px}
+#foods .fitem{padding:7px 4px}
+#foods .fclose{position:absolute;top:8px;right:10px;width:32px;height:32px;min-height:0;padding:0;border-radius:50%;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center}
 .ftabs{display:flex;gap:6px;margin:0 0 8px}
 .ftabs button{flex:1;padding:7px 4px;font-size:13.5px;background:#fff3d6;box-shadow:none}
 .ftabs button.on{background:#ffd23f}
@@ -600,7 +604,7 @@ html,body{overscroll-behavior-y:contain}
 <div id="phone" hidden><div class="phdev"><div class="phbar"><button id="phback" hidden>‹ 뒤로</button><span id="phtime">12:00</span><button id="phclose" aria-label="닫기">닫기</button></div><div id="phscreen"></div><div class="toast" id="phtoast"></div></div></div>
 <div id="farm" hidden><div class="fxfull" id="fmfx"></div><div class="chwrap"><div class="chhead"><div class="t" style="flex:1;font-size:19px">농장</div><div class="chs" id="fmt"></div></div><div id="fmbody"></div><div class="chbtns" style="grid-template-columns:1fr"><button id="fmexit">나가기</button></div></div></div>
 <div id="cook" hidden><div class="fxfull" id="ckfx"></div><div class="chwrap"><div class="chhead"><div class="t" style="flex:1;font-size:19px">요리하기</div><div class="chs" id="ckt"></div></div><div class="cktabs" id="cktabs"><button data-t="cook" class="on">요리하기</button><button data-t="dish">내 요리</button><button data-t="book">레시피 도감</button></div><div id="ckbody"></div><div class="chbtns" style="grid-template-columns:1fr"><button id="ckexit">나가기</button></div></div></div>
-<div id="foods" hidden><div class="fbox"><p>무엇을 먹일까요?</p><div class="ftabs" id="ftabs"><button data-ft="basic" class="on">기본 먹이</button><button data-ft="dish">내 요리</button></div><div class="fgrid" id="fgrid"></div><div class="fgrid" id="dgrid" hidden></div><button id="fclose" class="fclose">닫기</button></div></div>
+<div id="foods" hidden><div class="fbox"><p>무엇을 먹일까요?</p><div class="ftabs" id="ftabs"><button data-ft="basic" class="on">기본 먹이</button><button data-ft="dish">내 요리</button></div><div class="fgrid" id="fgrid"></div><div class="fgrid" id="dgrid" hidden></div><button id="fclose" class="fclose" aria-label="닫기">✕</button></div></div>
 
 <div id="hall" hidden><div class="fbox"><p>바나나 도감</p><div id="halllist"></div><button id="hallnew" class="hn" hidden>새 바나나 키우기</button><button id="hallclose" class="fclose">닫기</button></div></div>
 <div id="modal" hidden><div class="mbox"><p id="mtext"></p><input id="minput" maxlength="8" autocomplete="off"><div class="mbtns"><button id="mok">확인</button><button id="mcancel">취소</button></div></div></div>
