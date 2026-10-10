@@ -605,19 +605,19 @@ function save(){ S.last = Date.now(); try{ localStorage.setItem(KEY, JSON.string
 const clamp = (v,a=0,b=100)=>Math.max(a,Math.min(b,v));
 
 function tick(sec, offline){
-  // 자리를 비운 동안엔 더 천천히 줄고, 배부름 35 · 기분 40 · 에너지 30 밑으로는 내려가지 않아요 (켰을 때 슬프지 않게)
-  const hf = offline ? Math.min(S.hunger, 35) : 0, mf = offline ? Math.min(S.mood, 40) : 0;
+  // 자리를 비운 동안엔 더 천천히 줄고, 배부름 60 · 기분 60 · 에너지 50 밑으로는 내려가지 않아요 (하루 만에 열어도 배고프지 않게)
+  const hf = offline ? Math.min(S.hunger, 60) : 0, mf = offline ? Math.min(S.mood, 60) : 0;
   if(S.sleeping){
     S.energy = clamp(S.energy + sec*(10/3)); // 자는 동안 3초에 에너지 10 회복
-    S.hunger = clamp(S.hunger - sec*(offline ? 0.002 : 0.006), hf);
-    S.mood   = clamp(S.mood   - sec*(offline ? 0.001 : 0.003), mf);
+    S.hunger = clamp(S.hunger - sec*(offline ? 0.001 : 0.006), hf);
+    S.mood   = clamp(S.mood   - sec*(offline ? 0.0005 : 0.003), mf);
     if(S.energy>=100 && !offline) wake('푹 잤다! 기운이 넘쳐요 ⚡');
     if(S.energy>=100 && offline) S.sleeping=false;
   }else{
-    S.hunger = clamp(S.hunger - sec*(offline ? 0.005 : 0.012), hf);
-    S.mood   = clamp(S.mood   - sec*(offline ? 0.003 : 0.008), mf);
-    // 에너지는 천천히 줄어요 (켜 둘 때 0.007/초, 자리를 비웠을 땐 0.003/초)
-    S.energy = clamp(S.energy - sec*(offline ? 0.003 : 0.007), offline ? Math.min(S.energy, 30) : 0);
+    S.hunger = clamp(S.hunger - sec*(offline ? 0.003 : 0.012), hf);
+    S.mood   = clamp(S.mood   - sec*(offline ? 0.002 : 0.008), mf);
+    // 에너지는 천천히 줄어요 (켜 둘 때 0.007/초, 자리를 비웠을 땐 0.002/초)
+    S.energy = clamp(S.energy - sec*(offline ? 0.002 : 0.007), offline ? Math.min(S.energy, 50) : 0);
   }
 }
 
