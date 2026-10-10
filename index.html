@@ -1263,10 +1263,10 @@ function toggleSound(el){ S.snd = (S.snd===false); save(); soundBtn(el); if(S.sn
 /* ===== 미니게임 · 바나나 두더지 ===== */
 const MOLE_SEC = 30;
 const MOLE_LEVELS = {
-  veryeasy:{name:'매우 쉬움', face:'sleepy', up:1500, gap:1000, max:1, bad:0,   gold:.10, target:8,  coin:15,  exp:1, loseCoin:3,  loseExp:1},
-  easy:    {name:'쉬움',     face:'happy',  up:1200, gap:800,  max:2, bad:0,   gold:.12, target:14, coin:30,  exp:2, loseCoin:5,  loseExp:1},
-  normal:  {name:'보통',     face:'normal', up:950,  gap:650,  max:2, bad:.15, gold:.12, target:20, coin:60,  exp:4, loseCoin:8,  loseExp:1},
-  hard:    {name:'어려움',   face:'angry',  up:750,  gap:500,  max:3, bad:.20, gold:.12, target:28, coin:120, exp:8, loseCoin:12, loseExp:1}
+  veryeasy:{name:'매우 쉬움', face:'sleepy', up:1500, gap:1000, max:1, bad:0,   gold:.10, target:8,  coin:8,  exp:1, loseCoin:2,  loseExp:1},
+  easy:    {name:'쉬움',     face:'happy',  up:1200, gap:800,  max:2, bad:0,   gold:.12, target:14, coin:15,  exp:2, loseCoin:3,  loseExp:1},
+  normal:  {name:'보통',     face:'normal', up:950,  gap:650,  max:2, bad:.15, gold:.12, target:20, coin:30,  exp:4, loseCoin:4,  loseExp:1},
+  hard:    {name:'어려움',   face:'angry',  up:750,  gap:500,  max:3, bad:.20, gold:.12, target:28, coin:60, exp:8, loseCoin:6, loseExp:1}
 };
 const BURR_SVG = '<svg viewBox="0 0 64 64" aria-hidden="true"><g stroke="#5a3a12" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M32 4 L38 14 L50 10 L50 22 L60 28 L52 38 L58 50 L46 50 L42 60 L32 52 L22 60 L18 50 L6 50 L12 38 L4 28 L14 22 L14 10 L26 14 Z" fill="#a8683a"/><circle cx="32" cy="32" r="14" fill="#7a4a22"/><circle cx="26" cy="30" r="2.6" fill="#fff"/><circle cx="38" cy="30" r="2.6" fill="#fff"/><path d="M26 39 Q32 34 38 39" fill="none" stroke="#fff" stroke-width="2.6"/></g></svg>';
 let mOn = false, mLevel = 'veryeasy', mScore = 0, mLeft = 0, mT = null, mNext = 0, mHoles = [], mFaceT = null;
@@ -1376,10 +1376,10 @@ $('gclose').onclick = ()=>{ $('games').hidden = true; };
 $('games').onclick = e=>{ if(e.target===$('games')) $('games').hidden = true; };
 /* ===== 미니게임 · 틱택토 ===== */
 const TT_LEVELS = {
-  veryeasy:{name:'매우 쉬움', face:'sleepy', coin:15,  exp:1,  drawCoin:7,  drawExp:1, loseCoin:3, loseExp:1},
-  easy:    {name:'쉬움',     face:'happy',  coin:30, exp:2,  drawCoin:12,  drawExp:1, loseCoin:5, loseExp:1},
-  normal:  {name:'보통',     face:'normal', coin:60, exp:4,  drawCoin:25, drawExp:2, loseCoin:8, loseExp:1},
-  hard:    {name:'어려움',   face:'angry',  coin:120, exp:8,  drawCoin:50, drawExp:4, loseCoin:12, loseExp:1}
+  veryeasy:{name:'매우 쉬움', face:'sleepy', coin:8,  exp:1,  drawCoin:4,  drawExp:1, loseCoin:2, loseExp:1},
+  easy:    {name:'쉬움',     face:'happy',  coin:15, exp:2,  drawCoin:6,  drawExp:1, loseCoin:3, loseExp:1},
+  normal:  {name:'보통',     face:'normal', coin:30, exp:4,  drawCoin:12, drawExp:2, loseCoin:4, loseExp:1},
+  hard:    {name:'어려움',   face:'angry',  coin:60, exp:8,  drawCoin:25, drawExp:4, loseCoin:6, loseExp:1}
 };
 const TT_LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 let tb = [], tLevel = 'normal', tOver = false, tThink = false, tAiT = null, tFaceT = null, tLine = null;
