@@ -32,6 +32,19 @@ body.editing .roomb{display:none}body:has(#walk:not([hidden])) .roomb{display:no
 #mq .att.big{background:#fff3d6}
 #mq .mqgo{width:100%;margin-top:2px}
 #mq .mqclose{width:100%;margin-top:10px}
+#lbpop{position:fixed;inset:0;z-index:45;background:rgba(90,58,18,.72);display:flex;align-items:center;justify-content:center;padding:18px}
+#lbpop[hidden]{display:none}
+#lbpop .lbp{background:#fffdf2;border:3px solid #8a4b12;border-radius:24px;width:100%;max-width:300px;padding:20px 18px 16px;text-align:center;color:#5a3a12;box-shadow:0 8px 0 rgba(138,75,18,.3);display:grid;gap:8px;animation:lbin .35s ease-out}
+#lbpop .lbp h2{margin:0;font-size:19px}
+#lbpop .lbp p{margin:0;font-size:13px;font-weight:700;opacity:.75}
+#lbpop .lbp button{width:100%;margin-top:6px}
+#lbpop .lbbig{height:120px;display:grid;place-items:center}
+#lbpop .lbbig svg,#lbpop .lbbig img{width:112px;height:112px;object-fit:contain}
+#lbpop .lbbig.shake svg{animation:lbwig 1s ease-in-out infinite;transform-origin:50% 90%}
+#lbpop .lbbig.pop svg,#lbpop .lbbig.pop img{animation:lbpop .55s ease-out}
+#lbpop .lbamt{font-size:26px;font-weight:900;color:#c4730d}
+@keyframes lbin{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){#lbpop .lbp,#lbpop .lbbig svg,#lbpop .lbbig img{animation:none!important}}
 #mq .lbic{width:42px;height:42px;flex:none;display:grid;place-items:center}
 #mq .lbic svg{width:40px;height:40px}
 #mq .lbrow:not(.done) .lbic svg{animation:lbwig 1.6s ease-in-out infinite;transform-origin:50% 90%}
@@ -2208,7 +2221,7 @@ $('fmbody').onclick = e=>{
   if(typeof addEventListener !== 'function' || typeof document === 'undefined' || !document.body) return;
   const TH = 90;
   let y0 = 0, active = false, dist = 0, bar = null;
-  const BLOCK = '#pet,#stage,#mole,#ttt,#hall,#phone,#cook,#farm,#games,#tgames,#editbar,#modal,#shop,#walk,input,textarea';
+  const BLOCK = '#pet,#stage,#mole,#ttt,#hall,#phone,#cook,#farm,#games,#tgames,#editbar,#modal,#shop,#walk,#lbpop,input,textarea';
   function mk(){
     if(bar) return bar;
     bar = document.createElement('div');
@@ -2216,7 +2229,7 @@ $('fmbody').onclick = e=>{
     document.body.appendChild(bar); return bar;
   }
   function overlayOpen(){
-    return ['mole','ttt','hall','phone','cook','farm','games','tgames','modal','shop'].some(id=>{ const e = document.getElementById(id); return e && !e.hidden && getComputedStyle(e).display !== 'none' && getComputedStyle(e).position === 'fixed'; });
+    return ['mole','ttt','hall','phone','cook','farm','games','tgames','modal','shop','lbpop'].some(id=>{ const e = document.getElementById(id); return e && !e.hidden && getComputedStyle(e).display !== 'none' && getComputedStyle(e).position === 'fixed'; });
   }
   addEventListener('touchstart', e=>{
     active = false;
@@ -2538,8 +2551,27 @@ function lbOpen(){
   const g = lbRoll(); l.got = g;
   if(g.t === 'coin') addCoins(g.n);
   else { const p = pantryState(); p[g.id] = (p[g.id]||0) + 1; foodGridUpd(); }
-  gain(1); sfx('promote'); say('행운 상자에서 ' + lbText(g) + '!', 3500);
-  return true;
+  gain(1); save();
+  return g;
+}
+const LB_BOX = '<svg viewBox="0 0 64 64" aria-hidden="true"><g stroke="#8a4b12" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="10" y="26" width="44" height="30" rx="4" fill="#ffd95a"/><rect x="6" y="18" width="52" height="12" rx="4" fill="#ffb04a"/><path d="M32 18 V56" fill="none"/><path d="M32 18 Q20 2 14 10 Q12 18 32 18 Q52 18 50 10 Q44 2 32 18Z" fill="#ff7a6b"/></g></svg>';
+function lbPopup(g){
+  let pop = $('lbpop');
+  if(!pop){ pop = document.createElement('div'); pop.id = 'lbpop'; pop.hidden = true; document.body.appendChild(pop); }
+  const show = (big, cls, title, sub, amt, next)=>{
+    pop.innerHTML = `<div class="lbp"><div class="lbbig ${cls}">${big}</div><h2>${title}</h2>${amt?`<div class="lbamt">${amt}</div>`:''}<p>${sub}</p><button id="lbok">확인</button></div>`;
+    pop.hidden = false; $('lbok').onclick = next;
+  };
+  sfx('promote');
+  show(LB_BOX, 'shake', '행운 상자가 도착했어요!', '무엇이 들어 있는지 확인해 볼까요?', '', ()=>{
+    sfx('promote');
+    const coin = g.t === 'coin', f = coin ? null : FOODS.find(x=>x.id===g.id);
+    show(coin ? icon('coin') : icon(g.id), 'pop', coin ? '코인을 받았어요!' : '맛있는 간식을 받았어요!',
+      coin ? '바나나 키우기에 쓰는 코인이에요' : '먹이 주기에서 바나나에게 줄 수 있어요', coin ? '+' + g.n : (f ? f.n : '간식') + ' 1개', ()=>{
+        pop.hidden = true; window.__lbPop = true; say('행운 상자에서 ' + lbText(g) + '!', 3500);
+        render(); mqRender(); updMqDot();
+      });
+  });
 }
 
 /* ===== 바나나가 먼저 말 걸기 ===== */
@@ -2610,7 +2642,7 @@ $('mq').onclick = e=>{
   } else if(b.dataset.mb){
     if(!q.b && q.ids.every(id=>q.c[id])){ q.b = true; addCoins(MQ_BONUS); gain(5); sfx('promote'); }
   } else if(b.dataset.lb){
-    if(lbOpen()) window.__lbPop = true;
+    { const g = lbOpen(); if(g){ lbPopup(g); return; } }
   } else if(b.dataset.att){
     if(S.att.last !== q.d){ const i = (S.att.n||0)%7; S.att.n = (S.att.n||0)+1; S.att.last = q.d; addCoins(ATT_REWARD[i]); if(i===6) gain(10); sfx('promote'); }
   }
