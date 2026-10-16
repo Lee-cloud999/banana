@@ -32,6 +32,13 @@ body.editing .roomb{display:none}body:has(#walk:not([hidden])) .roomb{display:no
 #mq .att.big{background:#fff3d6}
 #mq .mqgo{width:100%;margin-top:2px}
 #mq .mqclose{width:100%;margin-top:10px}
+#mq .lbic{width:42px;height:42px;flex:none;display:grid;place-items:center}
+#mq .lbic svg{width:40px;height:40px}
+#mq .lbrow:not(.done) .lbic svg{animation:lbwig 1.6s ease-in-out infinite;transform-origin:50% 90%}
+#mq .lbrow.pop .lbic svg{animation:lbpop .6s ease-out}
+@keyframes lbwig{0%,70%,100%{transform:rotate(0)}76%{transform:rotate(-9deg)}84%{transform:rotate(9deg)}92%{transform:rotate(-5deg)}}
+@keyframes lbpop{0%{transform:scale(.6)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){#mq .lbic svg{animation:none!important}}
 #bk .bkbox{background:#fffdf2;border:3px solid #8a4b12;border-radius:22px;width:100%;max-width:360px;max-height:92vh;overflow-y:auto;padding:16px 14px 14px;color:#5a3a12;box-shadow:0 8px 0 rgba(138,75,18,.25)}
 #bk h2{margin:0 0 4px;text-align:center;font-size:18px}
 #bk .bkd{margin:0 0 10px;text-align:center;font-size:12.5px;font-weight:600;opacity:.8;line-height:1.4}
@@ -630,11 +637,12 @@ function petSVG(face, gold){
 const KEY = 'banana-game-v1';
 const STAGES = ['아기 바나나','꼬마 바나나','튼튼 바나나','씩씩 바나나','똑똑 바나나','멋쟁이 바나나','반짝 바나나','슈퍼 바나나','전설 바나나','황금 바나나'];
 const $ = id => document.getElementById(id);
-let S;
+let S, awayRaw = 0;
 
 function fresh(){ return {name:'바나나',hunger:70,mood:70,energy:80,exp:0,level:1,sleeping:false,last:Date.now(),coins:10,owned:['bg_day'],worn:{hat:null,acc:null,prop:null,bg:'bg_day'},pets:0,born:Date.now(),hall:[]}; }
 function load(){
   try{ S = JSON.parse(localStorage.getItem(KEY)) || fresh(); }catch(e){ S = fresh(); }
+  awayRaw = Math.max(0, (Date.now()-(S.last||Date.now()))/1000);
   // 자리 비운 동안의 변화 (최대 8시간, 너무 슬퍼지지 않게 최소값 유지)
   const away = Math.min((Date.now()-S.last)/1000, 8*3600);
   tick(away, true);
@@ -1654,7 +1662,7 @@ async function graduate(){
   if(S.level < MAX_LEVEL) return;
   if(!Array.isArray(S.hall)) S.hall = [];
   S.hall.push({name:S.name, level:S.level, born:S.born||Date.now(), done:Date.now(), pets:S.pets||0, hat:S.worn&&S.worn.hat, acc:S.worn&&S.worn.acc, prop:S.worn&&S.worn.prop, snap:snapOf(), photo:(typeof snapNow==='function'?snapNow('happy'):null)});
-  const keep = {hall:S.hall, coins:S.coins, owned:S.owned, worn:S.worn, pos:S.pos, chess:S.chess, ttt:S.ttt, snd:S.snd, farm:S.farm, dishes:S.dishes, recipes:S.recipes, photos:S.photos, phone:S.phone, pantry:S.pantry, bananas:S.bananas};
+  const keep = {hall:S.hall, coins:S.coins, owned:S.owned, worn:S.worn, pos:S.pos, chess:S.chess, ttt:S.ttt, snd:S.snd, farm:S.farm, dishes:S.dishes, recipes:S.recipes, photos:S.photos, phone:S.phone, pantry:S.pantry, bananas:S.bananas, lucky:S.lucky, greetAt:S.greetAt};
   S = Object.assign(fresh(), keep);
   S.born = Date.now();
   lastPetHTML = ''; save(); render();
@@ -2505,16 +2513,70 @@ function mqState(){
 }
 function mq(type, n){ try{ const q = mqState(); if(!q.ids.includes(type)) return; q.p[type] = (q.p[type]||0) + (n||1); updMqDot(); if($('mq') && !$('mq').hidden) mqRender(); }catch(e){} }
 const mqDef = id => MQ_POOL.find(m=>m.id===id);
+/* ===== 하루 행운 상자 ===== */
+const LB_FOODS = ['food_cookie','food_icecream','food_sandwich','food_pudding'];
+function luckyState(){
+  const d = todayStr();
+  if(!S.lucky || S.lucky.d !== d) S.lucky = {d, got:null};
+  return S.lucky;
+}
+function lbRoll(){
+  const r = Math.random(), pick = a=>a[Math.floor(Math.random()*a.length)];
+  if(r < .50) return {t:'coin', n:pick([10,15,20])};
+  if(r < .75) return {t:'coin', n:30};
+  if(r < .90) return {t:'food', id:pick(LB_FOODS)};
+  if(r < .97) return {t:'coin', n:50};
+  return {t:'food', id:'food_cake'};
+}
+function lbText(g){
+  if(!g) return '';
+  if(g.t === 'coin') return '코인 +' + g.n;
+  const f = FOODS.find(x=>x.id===g.id); return (f ? f.n : '간식') + ' 1개';
+}
+function lbOpen(){
+  const l = luckyState(); if(l.got) return false;
+  const g = lbRoll(); l.got = g;
+  if(g.t === 'coin') addCoins(g.n);
+  else { const p = pantryState(); p[g.id] = (p[g.id]||0) + 1; foodGridUpd(); }
+  gain(1); sfx('promote'); say('행운 상자에서 ' + lbText(g) + '!', 3500);
+  return true;
+}
+
+/* ===== 바나나가 먼저 말 걸기 ===== */
+const GREET = [
+  ['다시 왔네요! 기다렸어요','어서 와요! 같이 놀아요','왔다! 반가워요'],
+  ['보고 싶었어요!','어디 갔다 왔어요? 기다렸어요','오랜만이에요! 반가워요'],
+  ['너무너무 보고 싶었어요!','드디어 왔다! 계속 기다렸어요','돌아와 줘서 고마워요!']
+];
+function greet(sec){
+  if(!(sec >= 1800) || S.sleeping) return;
+  const tier = sec >= 12*3600 ? 2 : sec >= 3*3600 ? 1 : 0;
+  const list = GREET[tier];
+  let msg = list[Math.floor(Math.random()*list.length)];
+  let gift = 0;
+  if(tier >= 1 && Date.now() - (S.greetAt||0) > 3*3600*1000){
+    gift = tier === 2 ? 10 : 5; S.greetAt = Date.now();
+    msg += ' 선물이에요!';
+  }
+  setFace('happy', 3000); bounce(); say(msg, 5000);
+  if(gift) setTimeout(()=>{ addCoins(gift); save(); updMqDot(); }, 700);
+}
+
 function mqClaimable(){
   const q = mqState();
   const a = q.ids.filter(id=>!q.c[id] && (q.p[id]||0) >= mqDef(id).n).length;
   const all = q.ids.every(id=>q.c[id]) && !q.b;
-  return a + (all?1:0) + (S.att.last !== q.d ? 1 : 0);
+  return a + (all?1:0) + (S.att.last !== q.d ? 1 : 0) + (luckyState().got ? 0 : 1);
 }
 function updMqDot(){ const b = $('mqbtn'); if(b) b.classList.toggle('dot', mqClaimable() > 0); }
 function mqRender(){
   const q = mqState(); let h = '';
   const done = q.ids.filter(id=>q.c[id]).length;
+  { const l = luckyState(), pop = window.__lbPop ? ' pop' : ''; window.__lbPop = false;
+    const box = '<svg viewBox="0 0 64 64" aria-hidden="true"><g stroke="#8a4b12" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="10" y="26" width="44" height="30" rx="4" fill="#ffd95a"/><rect x="6" y="18" width="52" height="12" rx="4" fill="#ffb04a"/><path d="M32 18 V56" fill="none"/><path d="M32 18 Q20 2 14 10 Q12 18 32 18 Q52 18 50 10 Q44 2 32 18Z" fill="#ff7a6b"/></g></svg>';
+    h += '<h3>오늘의 행운 상자</h3>';
+    h += `<div class="mqrow lbrow${l.got?' done':''}${pop}"><span class="lbic">${box}</span><div class="mqt">${l.got ? '오늘의 선물' : '하루에 한 번 열 수 있어요'}<small>${l.got ? lbText(l.got) + ' · 내일 또 열어요' : '무엇이 들어 있을까요?'}</small></div>` +
+      (l.got ? '<span>완료</span>' : '<button data-lb="1">열기</button>') + '</div>'; }
   h += '<h3>일일 미션 ('+done+'/3)</h3>';
   q.ids.forEach(id=>{
     const m = mqDef(id), p = Math.min(q.p[id]||0, m.n), ok = p >= m.n, got = !!q.c[id];
@@ -2547,6 +2609,8 @@ $('mq').onclick = e=>{
     if(!q.c[id] && (q.p[id]||0) >= m.n){ q.c[id] = true; addCoins(m.c); gain(2); sfx('promote'); }
   } else if(b.dataset.mb){
     if(!q.b && q.ids.every(id=>q.c[id])){ q.b = true; addCoins(MQ_BONUS); gain(5); sfx('promote'); }
+  } else if(b.dataset.lb){
+    if(lbOpen()) window.__lbPop = true;
   } else if(b.dataset.att){
     if(S.att.last !== q.d){ const i = (S.att.n||0)%7; S.att.n = (S.att.n||0)+1; S.att.last = q.d; addCoins(ATT_REWARD[i]); if(i===6) gain(10); sfx('promote'); }
   }
@@ -2561,11 +2625,12 @@ if(S.level > MAX_LEVEL){ S.level = MAX_LEVEL; S.exp = 0; }
 render(); save();
 mqState(); updMqDot(); setInterval(()=>{ mqState(); updMqDot(); }, 30000);
 if(isNew) askName().then(()=>{ render(); save(); });
+else setTimeout(()=>greet(awayRaw), 800);
 setInterval(()=>{ tick(1); render(); }, 1000);
 setInterval(save, 5000);
 document.addEventListener('visibilitychange', ()=>{
   if(document.hidden) save();
-  else { const away=Math.min((Date.now()-S.last)/1000, 8*3600); tick(away,true); render(); }
+  else { const raw=Math.max(0,(Date.now()-S.last)/1000), away=Math.min(raw, 8*3600); tick(away,true); render(); greet(raw); }
 });
 window.addEventListener('pagehide', save);
 </script>
