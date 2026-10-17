@@ -45,6 +45,29 @@ body.editing .roomb{display:none}body:has(#walk:not([hidden])) .roomb{display:no
 #lbpop .lbamt{font-size:26px;font-weight:900;color:#c4730d}
 @keyframes lbin{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
 @media (prefers-reduced-motion:reduce){#lbpop .lbp,#lbpop .lbbig svg,#lbpop .lbbig img{animation:none!important}}
+#intro{position:fixed;inset:0;z-index:42;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(40,24,6,.62);overflow:hidden;animation:inFade .45s ease-out both;touch-action:manipulation}
+#intro.out{animation:inOut .45s ease-in both}
+#intro .glow{position:absolute;left:50%;top:50%;width:140vmax;height:140vmax;margin:-70vmax 0 0 -70vmax;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,244,190,.95) 0,rgba(255,226,120,.55) 9%,rgba(255,210,90,0) 22%),
+  repeating-conic-gradient(from 0deg,rgba(255,240,170,.34) 0 7deg,rgba(255,240,170,0) 7deg 22deg);
+  -webkit-mask-image:radial-gradient(circle,#000 0,#000 8%,transparent 30%);mask-image:radial-gradient(circle,#000 0,#000 8%,transparent 30%);
+  transform:scale(.05);opacity:0;animation:inGlow 3.6s ease-out .15s both,inSpin 14s linear infinite}
+#intro .ipet{position:relative;width:200px;height:230px;margin-top:-30px;transform:scale(0);animation:inPop 1.1s cubic-bezier(.3,1.5,.5,1) .85s both}
+#intro .ipet .pw{width:100%;height:100%;position:relative}
+#intro .ipet img{width:100%;height:100%;object-fit:contain;display:block;margin:auto;filter:drop-shadow(0 6px 18px rgba(255,230,120,.8))}
+#intro .itxt{position:relative;margin-top:14px;text-align:center;color:#fff7d6;font-weight:900;font-size:24px;letter-spacing:-.5px;text-shadow:0 3px 0 #8a4b12,0 0 18px rgba(255,220,100,.9);opacity:0;animation:inText .7s ease-out 1.5s both}
+#intro .isub{position:relative;margin-top:6px;color:#ffe9a8;font-weight:700;font-size:13px;opacity:0;animation:inText .7s ease-out 2.1s both}
+#intro .spk{position:absolute;top:-12%;width:var(--w);height:var(--w);left:var(--x);pointer-events:none;opacity:0;
+  background:var(--c);clip-path:polygon(50% 0,61% 38%,100% 50%,61% 62%,50% 100%,39% 62%,0 50%,39% 38%);
+  animation:inSpk var(--d) ease-in var(--t) both}
+@keyframes inFade{from{opacity:0}to{opacity:1}}
+@keyframes inOut{from{opacity:1}to{opacity:0}}
+@keyframes inGlow{0%{transform:scale(.05);opacity:0}25%{opacity:1}100%{transform:scale(1);opacity:.9}}
+@keyframes inSpin{to{rotate:360deg}}
+@keyframes inPop{0%{transform:scale(0) translateY(40px)}35%{transform:scale(1.28) translateY(-46px)}55%{transform:scale(.9) translateY(0)}72%{transform:scale(1.08) translateY(-18px)}88%{transform:scale(.97) translateY(0)}100%{transform:scale(1) translateY(0)}}
+@keyframes inText{from{opacity:0;transform:translateY(10px) scale(.92)}to{opacity:1;transform:none}}
+@keyframes inSpk{0%{opacity:0;transform:translateY(0) rotate(0) scale(.4)}12%{opacity:1}100%{opacity:0;transform:translateY(105vh) translateX(var(--dx)) rotate(260deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){#intro,#intro .glow,#intro .ipet,#intro .itxt,#intro .isub,#intro .spk{animation:none!important}#intro .ipet{transform:none}#intro .itxt,#intro .isub{opacity:1}#intro .glow{transform:scale(1);opacity:.7}#intro .spk{display:none}}
 #mq .lbic{width:42px;height:42px;flex:none;display:grid;place-items:center}
 #mq .lbic svg{width:40px;height:40px}
 #mq .lbrow:not(.done) .lbic svg{animation:lbwig 1.6s ease-in-out infinite;transform-origin:50% 90%}
@@ -871,6 +894,7 @@ $('reset').onclick = async ()=>{
   if(!ok) return;
   { const hall = S.hall || []; S = fresh(); S.hall = hall; }
   lastPetHTML = ''; render(); save();
+  await bananaIntro();
   await askName(); render(); save();
 };
 
@@ -884,6 +908,33 @@ function dialog(text,{input=false,def='',cancel=false}={}){
     ca.onclick=()=>done(input?null:false);
   });
 }
+/* ===== 바나나 첫 등장 연출 ===== */
+function bananaIntro(){
+  return new Promise(res=>{
+    if($('intro')){ return res(); }
+    const o = document.createElement('div'); o.id = 'intro';
+    const cols = ['#fff4b8','#ffd95a','#ffffff','#ffe27a','#ffc94a'];
+    let sp = '';
+    for(let i=0;i<26;i++){
+      const w = 8 + Math.random()*14, x = Math.random()*96, dx = (Math.random()-.5)*90, d = 2.2 + Math.random()*1.8, t = .9 + Math.random()*1.9;
+      sp += `<i class="spk" style="--w:${w.toFixed(1)}px;--x:${x.toFixed(1)}%;--dx:${dx.toFixed(0)}px;--d:${d.toFixed(2)}s;--t:${t.toFixed(2)}s;--c:${cols[i%cols.length]}"></i>`;
+    }
+    o.innerHTML = `<div class="glow"></div>${sp}<div class="ipet">${petSVG('happy', false)}</div><div class="itxt">반짝! 새로운 바나나 발견</div><div class="isub">화면을 톡 누르면 넘어가요</div>`;
+    document.body.appendChild(o);
+    sfx('promote');
+    setTimeout(()=>sfx('select'), 900);
+    let closed = false, tapOk = false;
+    const close = ()=>{
+      if(closed) return; closed = true;
+      o.classList.add('out');
+      setTimeout(()=>{ o.remove(); setFace('happy', 1800); bounce(); res(); }, 450);
+    };
+    setTimeout(()=>{ tapOk = true; }, 1200);
+    o.onclick = ()=>{ if(tapOk) close(); };
+    setTimeout(close, 4200);
+  });
+}
+
 async function askName(){
   const n = await dialog('바나나 이름을 지어주세요 🍌',{input:true,def:S.name||'바나나'});
   if(n && n.trim()) S.name = n.trim().slice(0,8);
@@ -1683,6 +1734,7 @@ async function graduate(){
   setFace('happy', 2500); bounce();
   say('새 바나나가 태어났어요! 졸업 선물로 코인 100개!', 4500);
   save();
+  await bananaIntro();
   await askName(); render(); save();
 }
 $('hallbtn').onclick = ()=>{ if(busy) return; renderHall(); $('hall').hidden = false; };
@@ -2840,7 +2892,7 @@ ensureShop();
 if(S.level > MAX_LEVEL){ S.level = MAX_LEVEL; S.exp = 0; }
 render(); save();
 mqState(); updMqDot(); setInterval(()=>{ mqState(); updMqDot(); }, 30000);
-if(isNew) askName().then(()=>{ render(); save(); });
+if(isNew) bananaIntro().then(()=>askName()).then(()=>{ render(); save(); });
 else setTimeout(()=>greet(awayRaw), 800);
 setInterval(()=>{ tick(1); render(); }, 1000);
 setInterval(save, 5000);
